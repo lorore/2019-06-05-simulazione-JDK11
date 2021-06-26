@@ -156,5 +156,82 @@ public class EventsDao {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public Integer getMigliore(Year y) {
+		String sql="SELECT e.district_id as id, COUNT(DISTINCT e.incident_id) AS n "
+				+ "FROM EVENTS e "
+				+ "WHERE YEAR(e.reported_date)=? "
+				+ "GROUP BY e.district_id "
+				+ "ORDER BY n ";
+		try {
+			Connection conn = DBConnect.getConnection() ;
 
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			st.setInt(1, y.getValue());
+			
+			
+			ResultSet res = st.executeQuery() ;
+			
+			if(res.first()) {
+				conn.close();
+				return res.getInt("id");
+			}
+			
+			conn.close();
+			return null;
+
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
+
+	
+	public List<Event> getEventiDelGiorno(int y, int m, int d){
+		String sql="SELECT * "
+				+ "FROM EVENTS e "
+				+ "WHERE YEAR(e.reported_date)=? AND MONTH(e.reported_date)=? AND DAY(e.reported_date)=? "
+				+ "ORDER BY e.reported_date ";
+		List<Event> list = new ArrayList<>() ;
+
+		try {
+			Connection conn = DBConnect.getConnection() ;
+
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			st.setInt(1, y);
+			st.setInt(2, m);
+			st.setInt(3, d);
+			
+			ResultSet res = st.executeQuery() ;
+			
+			while(res.next()) {
+				try {
+					list.add(new Event(res.getLong("incident_id"),
+							res.getInt("offense_code"),
+							res.getInt("offense_code_extension"), 
+							res.getString("offense_type_id"), 
+							res.getString("offense_category_id"),
+							res.getTimestamp("reported_date").toLocalDateTime(),
+							res.getString("incident_address"),
+							res.getDouble("geo_lon"),
+							res.getDouble("geo_lat"),
+							res.getInt("district_id"),
+							res.getInt("precinct_id"), 
+							res.getString("neighborhood_id"),
+							res.getInt("is_crime"),
+							res.getInt("is_traffic")));
+				} catch (Throwable t) {
+					t.printStackTrace();
+					System.out.println(res.getInt("id"));
+				}
+			}
+			
+			conn.close();
+			return list ;
+
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
 }

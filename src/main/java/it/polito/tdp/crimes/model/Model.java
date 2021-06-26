@@ -76,6 +76,19 @@ public class Model {
 public Set<District> getV(){
 	return this.graph.vertexSet();
 }
+
+public List<Event> getEventiGiorno(int y, int m, int d){
+	return this.dao.getEventiDelGiorno(y, m, d);
+}
 	
+public Integer getMigliore(int y) {
+	return this.dao.getMigliore(Year.of(y));
+}
+
+public void avviaSim(int N, int gg, int mm, int y) {
+	Simulator s=new Simulator(this, N, gg, mm, y);
+	s.init();
+	s.sim();
+}
 	
 }

@@ -2,7 +2,8 @@ package it.polito.tdp.crimes.model;
 
 import java.time.LocalDateTime;
 
-public class Event {
+
+public class Event implements Comparable<Event>{
 	
 	private Long incident_id;
 	private Integer offense_code;
@@ -18,6 +19,18 @@ public class Event {
 	private String neighborhood_id;
 	private Integer is_crime;
 	private Integer is_traffic;
+	private EventType type;
+	enum EventType{
+		LIBERATOAGENTE,
+		INCIDENTE
+		
+	};
+	public Event(LocalDateTime t, EventType tipo, int did ) {
+		this.reported_date=t;
+		type=tipo;
+		this.district_id=did;
+	}
+	
 	
 	public Event(Long incident_id, Integer offense_code, Integer offense_code_extension, String offense_type_id,
 			String offense_category_id, LocalDateTime reported_date, String incident_address, double geo_lon,
@@ -38,6 +51,7 @@ public class Event {
 		this.neighborhood_id = neighborhood_id;
 		this.is_crime = is_crime;
 		this.is_traffic = is_traffic;
+		this.type=EventType.INCIDENTE;
 	}
 	
 	public Long getIncident_id() {
@@ -154,6 +168,14 @@ public class Event {
 	public String toString() {
 		return "Event [incident_id=" + incident_id + ", offense_category_id=" + offense_category_id + ", reported_date="
 				+ reported_date + ", district_id=" + district_id + "]";
+	}
+public EventType getType() {
+	return this.type;
+}
+
+	@Override
+	public int compareTo(Event o) {
+		return this.reported_date.compareTo(o.reported_date);
 	}
 	
 	
